@@ -1,16 +1,11 @@
 #!/usr/bin/env python3
 """Bridge VAC-8 cards into VAD-Promptless self-describing visual cards.
 
-This tool turns a machine-readable VAC-8 JSON card into the existing
-VAD-Promptless Visual Skill Card payload, optionally wraps it in the
-Self-Describing Visual Card envelope and can embed that envelope into PNG
-metadata.
-
-Examples:
-  python tools/vac_self_describing.py convert VAC-VIDEO-001 --out /tmp/video.skill.json
-  python tools/vac_self_describing.py wrap VAC-VIDEO-001 --out /tmp/video.self.json
-  python tools/vac_self_describing.py embed VAC-VIDEO-001 card.png --out card.self.png --sidecar card.self.json
-  python tools/vac_self_describing.py extract card.self.png --out extracted.self.json
+Commands:
+  convert  VAC -> Promptless Visual Skill Card
+  wrap     VAC -> Self-Describing Visual Card envelope
+  embed    VAC + PNG -> PNG carrying validated machine metadata
+  extract  self-describing PNG -> validated envelope JSON
 """
 
 from __future__ import annotations
@@ -22,26 +17,32 @@ from pathlib import Path
 from typing import Any
 
 VAD_ROOT = Path(__file__).resolve().parents[1]
+VAD_TOOLS = Path(__file__).resolve().parent
 REPO_ROOT = VAD_ROOT.parent
 PROMPTLESS_TOOLS = REPO_ROOT / "skills" / "vad-promptless" / "tools"
 
-if str(PROMPTLESS_TOOLS) not in sys.path:
-    sys.path.insert(0, str(PROMPTLESS_TOOLS))
+for path in (VAD_TOOLS, PROMPTLESS_TOOLS):
+    if str(path) not in sys.path:
+        sys.path.insert(0, str(path))
 
 import promptless_card  # type: ignore  # noqa: E402
 import self_describing_card as sdc  # type: ignore  # noqa: E402
-
 from vac_runner import basic_validate, card_path, load_json  # noqa: E402
 
 METADATA_KEY = "vad-promptless"
 
 
 def normalize_version(value: str | None) -> str:
-    raw = str(value or "1.0.0")
-    parts = raw.split(".")
+    parts = str(value or "1.0.0").split(".")
     while len(parts) < 3:
         parts.append("0")
     return ".".join(parts[:3])
+
+
+def protocol_id(vac: dict[str, Any]) -> str:
+    """Self-Describing protocol IDs are lowercase; source VAC ID is preserved elsewhere."""
+    raw = str(vac.get("card_id") or vac["task_goal"]["name"])
+    return raw.strip().replace(" ", "-").lower()
 
 
 def infer_input_type(name: str) -> str:
@@ -54,11 +55,11 @@ def infer_input_type(name: str) -> str:
         return "image"
     if any(k in text for k in ("excel", "csv", "試算表", "spreadsheet", "資料檔")):
         return "spreadsheet"
-    if any(k in text for k in ("pdf",)):
+    if "pdf" in text:
         return "pdf"
     if any(k in text for k in ("逐字稿", "文件", "文案", "資料", "報告", "docx", "document", "文字")):
         return "document"
-    if any(k in text for k in ("網址", "url", "網站", "reference site")):
+    if any(k in text for k in ("網址", "url", "網站")):
         return "url"
     return "file"
 
@@ -70,13 +71,6 @@ def output_format_string(spec: dict[str, Any]) -> str:
     return str(fmt or "unspecified")
 
 
-def qa_method(criterion: str) -> str:
-    text = criterion.lower()
-    if any(k in text for k in ("開啟", "播放", "重算", "公式", "程式", "解碼", "頁數", "時長")):
-        return "tool"
-    return "model"
-
-
 def severity_to_promptless(value: str | None) -> str:
     return {
         "critical": "blocker",
@@ -85,57 +79,49 @@ def severity_to_promptless(value: str | None) -> str:
     }.get(str(value or "major").lower(), "warning")
 
 
+def qa_method(criterion: str) -> str:
+    text = criterion.lower()
+    machine_terms = ("開啟", "播放", "重算", "公式", "程式", "解碼", "頁數", "時長")
+    return "tool" if any(term in text for term in machine_terms) else "model"
+
+
 def vac_to_skill(vac: dict[str, Any]) -> dict[str, Any]:
     errors = basic_validate(vac)
     if errors:
         raise ValueError("Invalid VAC-8:\n" + "\n".join(f"- {e}" for e in errors))
 
     goal = vac["task_goal"]
-    inputs = vac.get("input_assets", {})
+    assets = vac.get("input_assets", {})
     output_spec = vac.get("output_specification", {})
 
-    promptless_inputs: list[dict[str, Any]] = []
-    for required in (True, False):
-        key = "required" if required else "optional"
-        for name in inputs.get(key, []):
-            promptless_inputs.append(
-                {
-                    "name": str(name),
-                    "type": infer_input_type(str(name)),
-                    "required": required,
-                }
-            )
+    inputs: list[dict[str, Any]] = []
+    for field, required in (("required", True), ("optional", False)):
+        for name in assets.get(field, []):
+            inputs.append({"name": str(name), "type": infer_input_type(str(name)), "required": required})
+    if not inputs:
+        inputs.append({"name": "task_input", "type": "file", "required": True})
 
-    if not promptless_inputs:
-        promptless_inputs.append({"name": "task_input", "type": "file", "required": True})
-
-    process = []
-    for step in vac.get("process_flow", []):
-        process.append(
-            {
-                "id": str(step["id"]),
-                "name": str(step.get("action", step["id"])),
-                "action": str(step["action"]),
-                "on_failure": "human_review" if "Critical" in str(step.get("checkpoint", "")) else "stop",
-            }
-        )
-
-    deliverables = output_spec.get("deliverables") or ["final_output"]
-    fmt_string = output_format_string(output_spec)
-    artifacts = [
+    process = [
         {
-            "name": str(name),
-            "type": "file",
-            "format": fmt_string,
-            "required": True,
+            "id": str(step["id"]),
+            "name": str(step.get("action", step["id"])),
+            "action": str(step["action"]),
+            "on_failure": "stop",
         }
+        for step in vac.get("process_flow", [])
+    ]
+
+    fmt = output_format_string(output_spec)
+    deliverables = output_spec.get("deliverables") or ["final_output"]
+    artifacts = [
+        {"name": str(name), "type": "file", "format": fmt, "required": True}
         for name in deliverables
     ]
 
-    qa_checks = []
+    checks = []
     for index, item in enumerate(vac.get("acceptance_criteria", []), start=1):
         criterion = str(item.get("criterion", f"check_{index}"))
-        qa_checks.append(
+        checks.append(
             {
                 "id": f"QA{index:02d}",
                 "criterion": criterion,
@@ -144,21 +130,27 @@ def vac_to_skill(vac: dict[str, Any]) -> dict[str, Any]:
             }
         )
 
+    content_constraints = [
+        str(item["rule"])
+        for item in vac.get("constraints", [])
+        if item.get("rule")
+    ]
+    content_constraints.extend(
+        f"IF {rule['if']} THEN {rule['then']}"
+        for rule in vac.get("decision_rules", [])
+    )
+
     allowed_tools = [
-        str(item.get("tool"))
+        str(item["tool"])
         for item in vac.get("tools_capabilities", [])
         if item.get("tool")
     ]
 
-    content_constraints = [str(item.get("rule")) for item in vac.get("constraints", []) if item.get("rule")]
-    for rule in vac.get("decision_rules", []):
-        content_constraints.append(f"IF {rule['if']} THEN {rule['then']}")
-
-    human_review = vac.get("human_review", {})
-    card = {
+    source_vac_id = str(vac.get("card_id", "VAC"))
+    payload = {
         "schema_version": "0.3.0",
         "card_type": "skill",
-        "id": str(vac.get("card_id") or goal["name"]).replace(" ", "-"),
+        "id": protocol_id(vac),
         "name": str(goal["name"]),
         "description": str(goal["primary_goal"]),
         "language": "zh-TW",
@@ -166,18 +158,18 @@ def vac_to_skill(vac: dict[str, Any]) -> dict[str, Any]:
             "version": normalize_version(vac.get("version")),
             "author": "draiagent",
             "license": "MIT",
-            "tags": ["VAD", "VAC-8", "Visual-Agent-Card"],
+            "tags": ["VAD", "VAC-8", "Visual-Agent-Card", source_vac_id],
         },
         "task": {
             "objective": str(goal["primary_goal"]),
-            "task_type": str(vac.get("card_id", "VAC")),
+            "task_type": source_vac_id,
             "success_definition": str(goal["completion_definition"]),
         },
-        "input": promptless_inputs,
+        "input": inputs,
         "style": {
             "language": str(output_spec.get("language", "繁體中文")),
             "brand": str(output_spec.get("brand", "依使用者提供之品牌規範")),
-            "format_constraints": [str(output_spec.get("size_or_duration", "")), fmt_string],
+            "format_constraints": [str(output_spec.get("size_or_duration", "")), fmt],
             "content_constraints": content_constraints,
         },
         "process": process,
@@ -185,10 +177,7 @@ def vac_to_skill(vac: dict[str, Any]) -> dict[str, Any]:
             "artifacts": artifacts,
             "delivery": str(output_spec.get("naming_rule", "依任務輸出規格命名")),
         },
-        "qa": {
-            "checks": qa_checks,
-            "pass_policy": "all_blockers",
-        },
+        "qa": {"checks": checks, "pass_policy": "all_blockers"},
         "execution": {
             "autonomy_level": 2,
             "dynamic_branching": False,
@@ -198,7 +187,7 @@ def vac_to_skill(vac: dict[str, Any]) -> dict[str, Any]:
             "delegation": False,
             "multi_agent": False,
             "external_side_effects": False,
-            "human_approval_required": bool(human_review.get("required", False)),
+            "human_approval_required": bool(vac.get("human_review", {}).get("required", False)),
             "allowed_tools": allowed_tools,
         },
         "upgrade_policy": {
@@ -208,8 +197,8 @@ def vac_to_skill(vac: dict[str, Any]) -> dict[str, Any]:
         },
     }
 
-    promptless_card.validate(card)
-    return card
+    promptless_card.validate(payload)
+    return payload
 
 
 def resolve_vac(value: str) -> tuple[Path, dict[str, Any]]:
@@ -236,16 +225,13 @@ def embed_png(image_path: Path, envelope: dict[str, Any], out_path: Path) -> Non
 
     sdc.validate_envelope(envelope)
     image = Image.open(image_path).convert("RGBA")
-    metadata = PngImagePlugin.PngInfo()
+    meta = PngImagePlugin.PngInfo()
     for key, value in getattr(image, "info", {}).items():
         if isinstance(value, str) and key != METADATA_KEY:
-            metadata.add_itxt(key, value)
-    metadata.add_itxt(
-        METADATA_KEY,
-        json.dumps(envelope, ensure_ascii=False, separators=(",", ":")),
-    )
+            meta.add_itxt(key, value)
+    meta.add_itxt(METADATA_KEY, json.dumps(envelope, ensure_ascii=False, separators=(",", ":")))
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    image.save(out_path, "PNG", pnginfo=metadata)
+    image.save(out_path, "PNG", pnginfo=meta)
 
 
 def extract_png(image_path: Path) -> dict[str, Any]:
@@ -264,16 +250,14 @@ def extract_png(image_path: Path) -> dict[str, Any]:
 
 def cmd_convert(args: argparse.Namespace) -> int:
     _, vac = resolve_vac(args.vac)
-    payload = vac_to_skill(vac)
-    write_json(payload, args.out)
+    write_json(vac_to_skill(vac), args.out)
     print(args.out)
     return 0
 
 
 def cmd_wrap(args: argparse.Namespace) -> int:
     _, vac = resolve_vac(args.vac)
-    payload = vac_to_skill(vac)
-    envelope = sdc.wrap(payload, mode=args.mode, reference_uri=args.reference_uri)
+    envelope = sdc.wrap(vac_to_skill(vac), mode=args.mode, reference_uri=args.reference_uri)
     write_json(envelope, args.out)
     print(args.out)
     return 0
@@ -281,8 +265,7 @@ def cmd_wrap(args: argparse.Namespace) -> int:
 
 def cmd_embed(args: argparse.Namespace) -> int:
     _, vac = resolve_vac(args.vac)
-    payload = vac_to_skill(vac)
-    envelope = sdc.wrap(payload, mode="hybrid", reference_uri=args.reference_uri)
+    envelope = sdc.wrap(vac_to_skill(vac), mode="hybrid", reference_uri=args.reference_uri)
     embed_png(args.image, envelope, args.out)
     if args.sidecar:
         write_json(envelope, args.sidecar)
@@ -291,40 +274,39 @@ def cmd_embed(args: argparse.Namespace) -> int:
 
 
 def cmd_extract(args: argparse.Namespace) -> int:
-    envelope = extract_png(args.image)
-    write_json(envelope, args.out)
+    write_json(extract_png(args.image), args.out)
     print(args.out)
     return 0
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="VAC-8 to self-describing visual card bridge")
+    parser = argparse.ArgumentParser(description="VAC-8 to Self-Describing Visual Card bridge")
     sub = parser.add_subparsers(dest="command", required=True)
 
-    p_convert = sub.add_parser("convert", help="Convert VAC-8 JSON to Promptless Visual Skill Card")
-    p_convert.add_argument("vac")
-    p_convert.add_argument("--out", type=Path, required=True)
-    p_convert.set_defaults(func=cmd_convert)
+    convert = sub.add_parser("convert")
+    convert.add_argument("vac")
+    convert.add_argument("--out", type=Path, required=True)
+    convert.set_defaults(func=cmd_convert)
 
-    p_wrap = sub.add_parser("wrap", help="Convert and wrap VAC as Self-Describing Visual Card JSON")
-    p_wrap.add_argument("vac")
-    p_wrap.add_argument("--out", type=Path, required=True)
-    p_wrap.add_argument("--mode", choices=["embedded", "sidecar", "reference", "hybrid"], default="hybrid")
-    p_wrap.add_argument("--reference-uri")
-    p_wrap.set_defaults(func=cmd_wrap)
+    wrap = sub.add_parser("wrap")
+    wrap.add_argument("vac")
+    wrap.add_argument("--out", type=Path, required=True)
+    wrap.add_argument("--mode", choices=["embedded", "sidecar", "reference", "hybrid"], default="hybrid")
+    wrap.add_argument("--reference-uri")
+    wrap.set_defaults(func=cmd_wrap)
 
-    p_embed = sub.add_parser("embed", help="Embed converted self-describing card into PNG metadata")
-    p_embed.add_argument("vac")
-    p_embed.add_argument("image", type=Path)
-    p_embed.add_argument("--out", type=Path, required=True)
-    p_embed.add_argument("--sidecar", type=Path)
-    p_embed.add_argument("--reference-uri")
-    p_embed.set_defaults(func=cmd_embed)
+    embed = sub.add_parser("embed")
+    embed.add_argument("vac")
+    embed.add_argument("image", type=Path)
+    embed.add_argument("--out", type=Path, required=True)
+    embed.add_argument("--sidecar", type=Path)
+    embed.add_argument("--reference-uri")
+    embed.set_defaults(func=cmd_embed)
 
-    p_extract = sub.add_parser("extract", help="Extract and validate self-describing metadata from PNG")
-    p_extract.add_argument("image", type=Path)
-    p_extract.add_argument("--out", type=Path, required=True)
-    p_extract.set_defaults(func=cmd_extract)
+    extract = sub.add_parser("extract")
+    extract.add_argument("image", type=Path)
+    extract.add_argument("--out", type=Path, required=True)
+    extract.set_defaults(func=cmd_extract)
 
     return parser
 
@@ -333,7 +315,7 @@ def main() -> int:
     args = build_parser().parse_args()
     try:
         return args.func(args)
-    except Exception as exc:  # CLI boundary
+    except Exception as exc:
         print(json.dumps({"error": str(exc)}, ensure_ascii=False, indent=2), file=sys.stderr)
         return 1
 
