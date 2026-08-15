@@ -6,6 +6,24 @@
 **語言：繁體中文（zh-TW）**  
 **定位：公開教學／企業 AI 導入／Skill-first／Agent／VAD／Self-Describing Visual Card**
 
+## 🆕 Visual Agent Design 完整 Agent 套件
+
+本 Repository 現在同時提供兩個層次：
+
+1. **VAD-Promptless**：研究「Zero Prompting for End Users」，把視覺卡片封裝成可直接召喚的 Skill / Workflow / Agent。
+2. **Visual Agent Design（VAD）**：更上層的完整方法論與跨模型 Agent，負責 **任務診斷 → 三維路由 → VAC-8 視覺任務卡 → Agent 執行 → 驗收 → 知識回存**。
+
+完整 VAD Agent 套件位於：
+
+- [`visual-agent-design/README.md`](visual-agent-design/README.md)
+- [`visual-agent-design/AGENT.md`](visual-agent-design/AGENT.md)
+- [`visual-agent-design/AGENTS.md`](visual-agent-design/AGENTS.md)
+- [`visual-agent-design/CLAUDE.md`](visual-agent-design/CLAUDE.md)
+- [`visual-agent-design/GEMINI.md`](visual-agent-design/GEMINI.md)
+- [`visual-agent-design/CHATGPT.md`](visual-agent-design/CHATGPT.md)
+
+> **Promptless 是介面策略；VAD 是任務與 Agent 設計方法論。**
+
 ## 核心概念
 
 ```text
@@ -37,6 +55,19 @@ VAD-Promptless/
 ├── GEMINI.md
 ├── CHATGPT.md
 ├── LICENSE
+├── visual-agent-design/         # 完整 VAD Agent / 方法論
+│   ├── AGENT.md
+│   ├── AGENTS.md
+│   ├── CLAUDE.md
+│   ├── GEMINI.md
+│   ├── CHATGPT.md
+│   ├── .agents/skills/
+│   ├── docs/
+│   ├── templates/
+│   ├── rubrics/
+│   ├── research/
+│   ├── schemas/
+│   └── examples/
 ├── skills/
 │   └── vad-promptless/
 │       ├── SKILL.md
@@ -78,25 +109,34 @@ YAML：`name: vad-promptless`；父資料夾：`skills/vad-promptless/`；技能
 
 ## Clone 與安裝
 
-Repository 正式名稱規劃為：
-
 ```bash
 git clone https://github.com/draiagent/VAD-Promptless.git
 cd VAD-Promptless
 ```
 
-### Claude Code
+### 使用完整 VAD Agent
+
+```bash
+cd visual-agent-design
+```
+
+此目錄包含 OpenAI Codex、Claude Code、Gemini CLI 與一般 ChatGPT 使用入口。詳細說明見 `visual-agent-design/README.md`。
+
+### Claude Code｜VAD-Promptless Skill
+
 ```bash
 mkdir -p ~/.claude/skills/vad-promptless
 cp -R skills/vad-promptless/. ~/.claude/skills/vad-promptless/
 ```
 
-### Gemini CLI
+### Gemini CLI｜VAD-Promptless Skill
+
 ```bash
 gemini skills install https://github.com/draiagent/VAD-Promptless.git --path skills/vad-promptless
 ```
 
-### ChatGPT / Codex
+### ChatGPT / Codex｜VAD-Promptless
+
 將 `skills/vad-promptless/` 下載或封裝為 Skill 套件；Codex 專案層可讀取根目錄 `AGENTS.md`。
 
 ## Self-Describing Card
@@ -119,4 +159,5 @@ python tools/png_card_metadata.py embed card.png /tmp/card.self.json --out card.
 `GOAL | ROLE | SKILLS | TOOLS | KNOWLEDGE | WORKFLOW | DECISION | SUB-AGENTS | MCP/A2A | QA/GOVERNANCE`
 
 ## 授權
+
 MIT License。
