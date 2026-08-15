@@ -3,24 +3,27 @@ name: Schema Validation
 on:
   push:
     paths:
-      - "schemas/**"
-      - "examples/machine-readable/**"
-      - "examples/visual-parser/**"
-      - "adapters/**"
-      - "tools/**"
-      - "tests/**"
+      - "skills/vad-promptless/**"
+      - "AGENTS.md"
+      - "CLAUDE.md"
+      - "GEMINI.md"
+      - "README.md"
+      - ".github/workflows/schema-validation.yml"
   pull_request:
     paths:
-      - "schemas/**"
-      - "examples/machine-readable/**"
-      - "examples/visual-parser/**"
-      - "adapters/**"
-      - "tools/**"
-      - "tests/**"
+      - "skills/vad-promptless/**"
+      - "AGENTS.md"
+      - "CLAUDE.md"
+      - "GEMINI.md"
+      - "README.md"
+      - ".github/workflows/schema-validation.yml"
 
 jobs:
   validate:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: skills/vad-promptless
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -30,6 +33,5 @@ jobs:
       - run: pytest -q
       - run: python tools/promptless_card.py validate examples/machine-readable/visual-skill-card.example.json
       - run: python tools/promptless_card.py validate examples/machine-readable/vad-agent-card.example.json
-      - run: python tools/promptless_card.py classify examples/machine-readable/skill-to-agent-upgrade.example.json
       - run: python tools/visual_card_parser.py validate-extraction examples/visual-parser/skill-card.extraction.json
-      - run: python tools/visual_card_parser.py validate-extraction examples/visual-parser/agent-card.extraction.json
+      - run: python tools/self_describing_card.py validate examples/self-describing/visual-skill-card.self.json

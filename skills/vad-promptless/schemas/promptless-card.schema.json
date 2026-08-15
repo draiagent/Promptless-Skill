@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/draiagent/Promptless-Skill/schemas/promptless-card.schema.json",
+  "$id": "https://github.com/draiagent/VAD-Promptless/blob/main/skills/vad-promptless/schemas/promptless-card.schema.json",
   "title": "Promptless Card Union Schema",
   "oneOf": [
     {"$ref": "visual-skill-card.schema.json"},

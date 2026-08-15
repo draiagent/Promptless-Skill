@@ -1,0 +1,18 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://github.com/draiagent/VAD-Promptless/blob/main/skills/vad-promptless/schemas/self-describing-visual-card.schema.json",
+  "title":"vad-promptless self-describing visual card schema",
+  "description":"v0.4.0 自描述視覺卡片 envelope；human layer 給人閱讀，machine layer 給 AI 執行。",
+  "type":"object","additionalProperties":false,
+  "required":["protocol","spec_version","id","display_name","card_kind","human_layer","machine_layer","binding","integrity","sync"],
+  "properties":{
+    "protocol":{"const":"vad-promptless"},"spec_version":{"const":"0.4.0"},
+    "id":{"type":"string","pattern":"^[a-z0-9][a-z0-9._-]{2,127}$"},"display_name":{"type":"string","minLength":1},"card_kind":{"enum":["skill","agent","auto"]},
+    "human_layer":{"type":"object","additionalProperties":false,"required":["language","title","summary","sections"],"properties":{"language":{"type":"string"},"title":{"type":"string","minLength":1},"summary":{"type":"string"},"sections":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["label","items"],"properties":{"label":{"type":"string"},"items":{"type":"array","items":{"type":"string"}}}}}}},
+    "machine_layer":{"type":"object","additionalProperties":false,"required":["media_type","encoding","payload"],"properties":{"media_type":{"const":"application/vnd.vad-promptless.card+json"},"encoding":{"const":"json"},"payload":{"type":"object"}}},
+    "binding":{"type":"object","additionalProperties":false,"required":["mode","carriers"],"properties":{"mode":{"enum":["embedded","sidecar","reference","hybrid"]},"carriers":{"type":"array","minItems":1,"uniqueItems":true,"items":{"enum":["png-metadata","sidecar-json","qr-reference","uri"]}},"reference_uri":{"type":"string"},"metadata_key":{"type":"string","default":"vad-promptless"}}},
+    "integrity":{"type":"object","additionalProperties":false,"required":["algorithm","canonicalization","payload_sha256"],"properties":{"algorithm":{"const":"sha256"},"canonicalization":{"const":"json-sort-keys-utf8"},"payload_sha256":{"type":"string","pattern":"^[a-f0-9]{64}$"}}},
+    "sync":{"type":"object","additionalProperties":false,"required":["execution_source","mismatch_policy"],"properties":{"execution_source":{"const":"machine_layer"},"mismatch_policy":{"enum":["reject","human_review"]}}},
+    "provenance":{"type":"object","additionalProperties":false,"properties":{"created_by":{"type":"string"},"created_at":{"type":"string"},"source":{"type":"string"},"license":{"type":"string"}}}
+  }
+}
