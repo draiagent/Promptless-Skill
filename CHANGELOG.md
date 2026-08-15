@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.1 - 2026-08-16
+
+- 新增 Visual Card Parser：圖片資訊卡先抽取為可稽核的 Extraction JSON。
+- 新增 `visual-card-extraction.schema.json`。
+- 新增跨模型視覺抽取 Adapter。
+- 新增 `visual_card_parser.py`，支援 validate-extraction / normalize / pipeline。
+- 新增 Skill 與 Agent 視覺抽取測試案例。
+- 新增 Perception Layer → Specification Layer 分層，降低圖片直接生成 Skill 的幻覺風險。
+- 中文卡片名稱使用穩定雜湊 ID，避免不同卡片發生機器名稱衝突。
+
 ## 0.3.0 - 2026-08-16
 
 - 新增 Visual Skill Card JSON Schema。
@@ -9,20 +19,13 @@
 - 建立 Skill → Agent 可機器判斷的升級條件與 Autonomy Level。
 - 新增 Machine-readable Skill 與 Agent JSON 範例。
 - 新增 Card → Skill / Agent Compiler 方法。
-- README / SKILL.md 升級為 v0.3.0。
-
 
 ## 0.2.0 - 2026-08-15
 
 - 將 Promptless Skill 擴充為 Skill × Agent × VAD 完整方法論。
 - 新增 Promptless Agent 方法論與 VAD 十欄。
-- 新增平台中立 `agents/promptless-vad-agent.md`。
-- 新增 Claude Code `.claude/agents/promptless-vad-agent.md`。
-- 新增 Gemini CLI `.gemini/agents/promptless-vad-agent.md`。
-- 新增 ChatGPT / Codex 使用入口。
-- 新增教學、Evaluation、Governance、Roadmap。
-- 新增 Promptless Agent 與 VAD Agent Card 模板。
-- 新增企業市場研究 Agent 範例。
+- 新增 Claude / Gemini / ChatGPT 跨模型入口。
+- 新增 Evaluation、Governance、Roadmap 與 Agent 模板。
 
 ## 0.1.0 - 2026-08-15
 
