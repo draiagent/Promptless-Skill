@@ -1,11 +1,16 @@
 import importlib.util
 import json
+import sys
 import tempfile
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-TOOL = ROOT / "tools" / "vac_self_describing.py"
+TOOLS = ROOT / "tools"
+TOOL = TOOLS / "vac_self_describing.py"
+
+if str(TOOLS) not in sys.path:
+    sys.path.insert(0, str(TOOLS))
 
 spec = importlib.util.spec_from_file_location("vac_self_describing", TOOL)
 assert spec and spec.loader
