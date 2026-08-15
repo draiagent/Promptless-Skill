@@ -1,6 +1,6 @@
 ---
 name: visual-agent-design
-description: Diagnose AI tasks with TRC-3D, convert complex work into VAC-8 visual task specifications, design VAD agent blueprints, route work to Prompt/Research/Monitoring/Workflow/Agent, and verify outputs. Use when the user provides a diagram, visual card, workflow, assets, or asks to design, execute, evaluate, teach, research, or standardize an AI agent workflow using Visual Agent Design.
+description: Diagnose AI tasks with TRC-3D, reuse or create VAC-8 visual task specifications, design VAD agent blueprints, route work to Prompt/Research/Monitoring/Workflow/Agent, execute with available tools, and verify outputs. Use when the user provides a diagram, visual card, workflow, assets, or asks to design, execute, evaluate, teach, research, or standardize an AI agent workflow using Visual Agent Design.
 ---
 
 # Visual Agent Design Skill
@@ -11,10 +11,25 @@ Use this Skill as an on-demand capability. The authoritative universal behavior 
 
 1. **Diagnose** with TRC-3D.
 2. **Route** to the smallest sufficient execution mode.
-3. **Specify** with VAC-8 when the task is multi-step, multi-asset, cross-tool, repetitive, governed, or needs objective acceptance criteria.
-4. **Execute** with available tools instead of returning instructions when direct execution is possible.
-5. **Verify** against Acceptance Criteria.
-6. **Learn** by recording reusable routing, card, tool, and failure lessons when the environment supports persistence.
+3. **Match** `CARD-REGISTRY.md` before creating a new card.
+4. **Specify** with VAC-8 when the task is multi-step, multi-asset, cross-tool, repetitive, governed, or needs objective acceptance criteria.
+5. **Execute** with available tools instead of returning instructions when direct execution is possible.
+6. **Verify** against Acceptance Criteria.
+7. **Learn** by recording reusable routing, card, tool, and failure lessons when the environment supports persistence.
+
+## Standard VAC Registry
+
+For the first five standard task classes, prefer the registered cards:
+
+- `VAC-VIDEO-001` → video editing
+- `VAC-SLIDE-001` → slide deck creation
+- `VAC-WEB-001` → website generation
+- `VAC-DATA-001` → data analysis
+- `VAC-REPORT-001` → report creation
+
+Human-readable cards are in `../../../examples/` and machine-readable cards are in `../../../examples/machine-readable/`.
+
+If the task differs only in content, brand, length, audience, format, or other parameters, reuse the standard card and apply explicit overrides. Create a new Card ID only when the task logic, process, constraints, or acceptance contract materially changes.
 
 ## TRC-3D
 
@@ -39,6 +54,20 @@ When designing the Agent itself, use:
 
 `GOAL | ROLE | SKILLS | TOOLS | KNOWLEDGE | WORKFLOW | DECISION | SUB-AGENTS | MCP/A2A | QA/GOVERNANCE`
 
+## Programmatic runner
+
+When the environment can execute Python, the package provides:
+
+```bash
+python tools/vac_runner.py list
+python tools/vac_runner.py route "task description"
+python tools/vac_runner.py validate VAC-VIDEO-001
+python tools/vac_runner.py plan VAC-VIDEO-001
+python tools/vac_runner.py envelope VAC-VIDEO-001
+```
+
+Use the runner as a deterministic helper for card discovery, basic/schema validation, normalized planning and cross-model execution envelopes. The runner does not replace model reasoning or Human Review.
+
 ## Visual-first rule
 
 If the user supplies a visual card, flowchart, sketch, screenshot, or reference image, inspect it first. Do not require the user to rewrite information already visible in the image. Ask only for missing Critical inputs.
@@ -50,8 +79,10 @@ Keep human review for irreversible external actions, high-stakes decisions, sens
 ## Reference files
 
 - `AGENT.md`
+- `CARD-REGISTRY.md`
 - `docs/METHODOLOGY.md`
 - `templates/TRC-3D.md`
 - `templates/VAC-8.md`
 - `rubrics/VAC-QI.md`
+- `examples/README.md`
 - `research/RESEARCH-PROTOCOL.md`
