@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+title: "Promptless Skill × VAD"
+message: "如果本方法論對你的研究、教學或專案有幫助，請引用此 Repository。"
+type: software
+version: 0.2.0
+date-released: 2026-08-15
+authors:
+  - family-names: "Chen"
+    given-names: "CGM Coach / Yilikang"
+repository-code: "https://github.com/draiagent/Promptless-Skill"
+license: MIT

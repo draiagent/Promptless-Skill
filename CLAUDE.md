@@ -1,15 +1,22 @@
-# CLAUDE.md
+# CLAUDE.md｜Claude Code 專案入口
 
-本專案採用 **Promptless Skill** 方法論。
+本專案採用 **Promptless Skill × VAD**。
 
-執行相關任務時：
+請優先遵循：
 
-- 主要規格：`SKILL.md`
-- 方法論：`docs/01-methodology.md`
-- Skill × VAD：`docs/02-skill-vad.md`
-- Agent × VAD：`docs/03-agent-vad.md`
-- Visual Skill Card：`docs/04-visual-skill-card.md`
+- `SKILL.md`
+- `docs/07-promptless-agent-methodology.md`
+- `agents/promptless-vad-agent.md`
+- `docs/11-governance.md`
 
-若 Claude Code 已將本資料夾安裝為 Agent Skill，應以 `SKILL.md` 的觸發描述與流程為主，不需把本檔視為第二套 Skill 規格。
+Claude Code 專案 Agent 定義位於：
 
-核心原則：終端使用者不需要每次重新撰寫完整 Prompt；可重複專業流程應封裝成 Skill，進入自主決策時以 VAD 設計 Agent。
+- `.claude/agents/promptless-vad-agent.md`
+
+若已將本專案安裝為 Skill，核心規格仍以 `SKILL.md` 為唯一真相來源；Agent 檔只負責代理角色、工具邊界與調度原則。
+
+核心原則：
+
+> Promptless = Zero Prompting for End Users
+
+> Skill 是能力，Agent 是大腦，VAD 是藍圖。

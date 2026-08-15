@@ -1,297 +1,327 @@
 ---
 name: promptless-skill
-description: 將使用者的任務、素材、資訊卡或既有工作流程轉換成「不用由終端使用者撰寫長提示詞」的可重複 Skill；也可直接以 Skill-first 方式執行已定義任務。當使用者說「使用 Promptless Skill」「套用無提示詞技能」「依照這張資訊卡執行」「不要叫我寫 Prompt」「把流程封裝成 Skill」「把 Skill 升級成 Agent」或任務明顯屬於可重複、可標準化工作時使用。涉及自主規劃、多工具、多代理或 MCP/A2A 時，必須連結 VAD（Visual Agent Design）思維設計 Agent。
+description: 將使用者的任務、素材、資訊卡或既有工作流程轉換成「終端使用者不必撰寫長提示詞」的可重複 Skill，並在需要自主規劃、多工具、MCP、Sub-Agent 或 A2A 時升級為 Promptless Agent，以 VAD（Visual Agent Design）描述 GOAL、ROLE、SKILLS、TOOLS、KNOWLEDGE、WORKFLOW、DECISION、SUB-AGENTS、MCP/A2A 與 QA/GOVERNANCE。當使用者說「使用 Promptless Skill」「不要叫我寫 Prompt」「依照資訊卡執行」「把流程封裝成 Skill」「把 Skill 升級成 Agent」「用 VAD 設計 Agent」或任務明顯可重複、可標準化、可代理化時使用。
 ---
 
-# Promptless Skill｜無提示詞技能
+# Promptless Skill｜無提示詞技能方法論
 
-## 1. 目的
+## 0. 核心定義
 
-讓終端使用者不必先學會撰寫完整 Prompt，也能可靠完成 AI 任務；同時把專家方法封裝成可重複、可分享、可版本化的 Skill。
+**Promptless ≠ 系統內完全沒有 Prompt。**
 
-**Promptless 不代表系統內沒有 Prompt。**
+> **Promptless = Zero Prompting for End Users**
 
-Promptless 的定義是：
-
-> **Zero Prompting for End Users**
-
-底層可以包含 Prompt、Context、Rules、Knowledge、Workflow、Tools 與 QA，但不要求終端使用者每次重寫。
-
----
-
-## 2. 核心行為規則
-
-啟用本 Skill 後：
-
-1. 優先理解「使用者要完成什麼」，不要先要求使用者學習 Prompt 格式。
-2. 如果目前素材足以開始工作，直接執行，不要求使用者重新把需求改寫成結構化 Prompt。
-3. 自動把需求整理為 TASK / INPUT / STYLE / PROCESS / OUTPUT / QA。
-4. 使用者提供資訊卡、圖片、文件或範例時，把它們視為任務規格與上下文來源，而不是要求使用者再次文字描述同樣內容。
-5. 任務可重複時，主動以可封裝 Skill 的方式思考，而不是只完成一次性答案。
-6. 只有在缺少真正不可推定、且會實質改變結果的必要資訊時才詢問。
-7. 涉及醫療、法律、財務、安全或其他高風險內容時，不因 Promptless 而降低必要的查證、限制、警告或人工確認。
-8. 不把「Promptless」解讀為「完全沒有底層指令」。
-
----
-
-## 3. 六欄任務模型
-
-將任何任務正規化為：
-
-### TASK
-- 要完成什麼？
-- 完成的終點是什麼？
-
-### INPUT
-- 有哪些資料、圖片、文件、網址、資料表、Logo、範例？
-- 哪些是必要輸入？哪些可自動推定？
-
-### STYLE
-- 語言
-- 品牌
-- 語氣
-- 視覺
-- 格式
-- 限制
-
-### PROCESS
-- 理解
-- 分析
-- 組織
-- 執行
-- 驗證
-- 修正
-
-### OUTPUT
-- 要交付的成果
-- 檔案格式
-- 長寬比
-- 結構
-- 數量
-
-### QA
-- 正確性
-- 完整性
-- 格式
-- 品牌一致性
-- 錯字
-- 引用／來源
-- 是否達成任務
-
----
-
-## 4. 執行流程
-
-### Phase A｜辨識意圖
-
-先從目前對話、附件、資訊卡、既有規則與可用工具推定使用者真正的 Job-to-be-Done。
-
-不要把「請再提供完整 Prompt」當成預設下一步。
-
-### Phase B｜建立 Skill Schema
-
-在內部建立：
-
-```text
-TASK
-INPUT
-STYLE
-PROCESS
-OUTPUT
-QA
-```
-
-必要時再加入：
-
-```text
-CONTEXT
-KNOWLEDGE
-RULES
-TOOLS
-FAILURE CONDITIONS
-HUMAN REVIEW
-```
-
-### Phase C｜決定執行層級
-
-#### Level 1：單一 Skill
-任務清楚、步驟固定、低自主性。
-
-#### Level 2：Workflow
-需要多個 Skill 按順序執行。
-
-#### Level 3：Agent
-需要根據中間結果自主決定下一步。
-
-#### Level 4：Multi-Agent
-需要不同角色／專業 Agent 協作。
-
-### Phase D｜執行
-
-使用平台可用的原生工具、Skill、Connector、MCP、程式碼或檔案能力完成任務。
-
-不要為了展示 Promptless 而刻意繞過更可靠的平台原生能力。
-
-### Phase E｜QA
-
-完成前逐項驗證：
-
-- TASK 是否完成？
-- INPUT 是否被正確使用？
-- STYLE 是否遵守？
-- PROCESS 是否漏步驟？
-- OUTPUT 是否符合指定格式？
-- QA 是否全部通過？
-
-不合格時，先修正再交付。
-
----
-
-## 5. 與 VAD 的連結
-
-當任務進入 Agent 層，不再只使用六欄 Skill Schema；必須轉換為 VAD 視覺代理設計模型：
-
-```text
-GOAL
-ROLE
-SKILLS
-TOOLS
-KNOWLEDGE
-WORKFLOW
-DECISION
-SUB-AGENTS
-MCP / A2A
-QA
-```
+底層可以包含 Prompt、Context、Rules、Knowledge、Workflow、Tools、MCP、Agent、Evaluation 與 QA；終端使用者不必每次從零撰寫。
 
 核心關係：
 
-> **Promptless Skill 封裝能力；VAD 設計代理如何使用能力。**
+> **Promptless Skill 封裝能力；Promptless Agent 調度能力；VAD 描述與治理代理藍圖。**
 
 > **Skill 是能力，Agent 是大腦，VAD 是藍圖。**
 
-### 何時升級成 VAD Agent？
+---
 
+## 1. 啟用後的基本行為
+
+1. 先理解使用者的 Job-to-be-Done，不先教 Prompt 格式。
+2. 若現有對話、圖片、附件、範例或規則足夠，直接開始，不要求使用者重寫同一份需求。
+3. 自動將任務正規化成 Skill 六欄。
+4. 若工作可重複，優先設計成可版本化 Skill，而不是一次性 Prompt。
+5. 若任務需要中途判斷、工具選擇、委派或迴圈，升級成 Agent。
+6. 進入 Agent 層後必須套用 VAD 十欄，而不是只把 Prompt 寫長。
+7. 使用平台原生 Skills、Tools、Connectors、MCP、Sub-Agent 能力；不要為了形式重造已有功能。
+8. 重要決策保留 Human Review；高風險任務維持必要查證、安全與權限限制。
+9. 完成前執行 QA / Evaluation，不以「模型已回答」視為任務完成。
+
+---
+
+## 2. Skill 六欄
+
+### TASK
+- 使用者真正想完成什麼？
+- 成功終點是什麼？
+
+### INPUT
+- 文字、圖片、PDF、試算表、網址、Logo、資料庫、API、範例等。
+- 區分必要輸入與可推定輸入。
+
+### STYLE
+- 語言、品牌、語氣、視覺、格式、合規限制。
+
+### PROCESS
+- 理解 → 分析 → 組織 → 執行 → 驗證 → 修正。
+
+### OUTPUT
+- 交付成果、格式、數量、比例、欄位與儲存位置。
+
+### QA
+- 正確性、完整性、來源、格式、錯字、品牌一致性與任務完成條件。
+
+必要時增加：
+
+```text
+CONTEXT | KNOWLEDGE | RULES | TOOLS | FAILURE CONDITIONS | HUMAN REVIEW
+```
+
+---
+
+## 3. 決定是否升級成 Agent
+
+### 保持 Skill
+適合：
+- 目標清楚
+- 步驟固定
+- 工具固定
+- 不需要依中間結果改變路徑
+
+### 升級 Workflow
+適合：
+- 多個 Skill 有固定先後順序
+- 決策點少
+
+### 升級 Agent
 符合任一條件時：
+- 必須根據中間結果決定下一步
+- 需要動態選 Skill / Tool / Knowledge
+- 需要外部 Connector / MCP
+- 需要持續循環或條件停止
+- 需要 Human Review / Escalation
 
-- 必須根據中間結果做下一步決策
-- 需要呼叫多個 Skill
-- 需要多個 Tool／Connector／MCP
-- 需要持續任務或循環
-- 需要角色分工
-- 需要 Sub-Agent
-- 需要 A2A 協作
-- 需要人工審核節點
+### 升級 Multi-Agent
+符合任一條件時：
+- 專業角色明顯不同
+- 可以平行執行
+- 單一 Agent 上下文或工具權限過大
+- 需要 A2A 協作或代理間驗證
 
-詳細規格讀取 `docs/03-agent-vad.md`。
+---
+
+## 4. VAD Agent 十欄
+
+進入 Agent 層後，建立：
+
+### GOAL
+最終目標與完成條件。
+
+### ROLE
+Agent 的責任、邊界、不應做的事。
+
+### SKILLS
+可使用的 Promptless Skills；每個 Skill 應有清楚觸發條件。
+
+### TOOLS
+搜尋、程式、文件、資料庫、API、Connector 等執行能力。
+
+### KNOWLEDGE
+RAG、企業知識庫、規範、記憶、資料來源與更新規則。
+
+### WORKFLOW
+預設路徑、可平行步驟、迴圈與停止條件。
+
+### DECISION
+哪些節點可以自主決定；哪些需要人工確認；失敗如何降級。
+
+### SUB-AGENTS
+可委派角色、輸入輸出契約與回傳格式。
+
+### MCP / A2A
+外部工具協定與代理協作規則。
+
+### QA / GOVERNANCE
+驗收、Evaluation、來源、權限、稽核、隱私、風險與 Human Review。
+
+完整方法：`docs/07-promptless-agent-methodology.md`。
+
+---
+
+## 5. 執行生命週期
+
+```text
+INTENT
+  ↓
+NORMALIZE
+  ↓
+SELECT LEVEL
+  ├─ Skill
+  ├─ Workflow
+  ├─ Agent
+  └─ Multi-Agent
+  ↓
+PLAN
+  ↓
+EXECUTE
+  ↓
+OBSERVE
+  ↓
+DECIDE / REPLAN
+  ↓
+QA / EVALUATE
+  ↓
+HUMAN REVIEW（必要時）
+  ↓
+DELIVER
+  ↓
+LEARN / VERSION
+```
+
+### INTENT
+從現有素材辨識目標，不要求重打 Prompt。
+
+### NORMALIZE
+建立六欄 Skill Schema；若已是 Agent 再建立 VAD 十欄。
+
+### SELECT LEVEL
+選擇最低足夠的自主性；不要把所有工作都做成 Agent。
+
+### PLAN
+建立工作分解、工具與資料來源。
+
+### EXECUTE
+使用平台原生工具完成真實工作。
+
+### OBSERVE
+讀取中間結果、錯誤、缺口與外部狀態。
+
+### DECIDE / REPLAN
+依決策規則修正路徑；高風險節點升級人工確認。
+
+### QA / EVALUATE
+逐項驗證成功條件。
+
+### DELIVER
+交付可直接使用成果，不只交付解說。
+
+### LEARN / VERSION
+若流程值得重用，將新規則、範例、失敗案例納入下一版 Skill / Agent。
 
 ---
 
 ## 6. Visual Skill Card
 
-若使用者提供資訊卡或希望建立「不用提示詞的資訊卡」，把 Visual Skill Card 視為 Promptless Skill 的人機介面，而不是單純海報。
-
-卡片至少呈現：
+把資訊卡視為 Skill 的視覺介面，而不是裝飾：
 
 ```text
 TASK | INPUT | STYLE | PROCESS | OUTPUT | QA
 ```
 
-卡片的目的：
+要求：
+1. 人可快速看懂。
+2. AI 可映射成 Skill Schema。
+3. 不依賴大量隱含條件。
+4. 可版本化。
+5. 可升級成 Workflow / Agent。
 
-1. 人看得懂
-2. AI 看得懂
-3. 可以映射到 Skill
-4. 可以再升級成 Workflow／Agent
-
-詳細規格讀取 `docs/04-visual-skill-card.md`。
+詳見 `docs/04-visual-skill-card.md`。
 
 ---
 
-## 7. 建立新 Promptless Skill 時
+## 7. VAD Agent Card
 
-當使用者要求「把這個流程做成不用提示詞的 Skill」：
+Agent 層使用：
+
+```text
+GOAL | ROLE | SKILLS | TOOLS | KNOWLEDGE
+WORKFLOW | DECISION | SUB-AGENTS | MCP/A2A | QA/GOVERNANCE
+```
+
+Agent Card 應讓企業主管、領域專家與工程人員都能回答：
+
+- 這個 Agent 為誰負責？
+- 它能做什麼？
+- 它不能做什麼？
+- 它會用哪些 Skill / Tool / Knowledge？
+- 哪裡會自主決定？
+- 哪裡一定要人確認？
+- 失敗時如何停止、降級或求助？
+
+模板：`templates/VAD-AGENT-CARD-TEMPLATE.md`。
+
+---
+
+## 8. 建立新 Promptless Skill
 
 1. 擷取 Job-to-be-Done。
-2. 建立六欄規格。
-3. 找出不可變規則與可變輸入。
+2. 建立六欄。
+3. 分離「不可變規則」與「每次輸入」。
 4. 把重複 Prompt 內容移入 Skill。
-5. 將詳細參考內容拆到 `docs/`、`references/`、`templates/` 或 `examples/`，避免主 `SKILL.md` 過長。
-6. 加入清楚的 `name` 與 `description`，description 必須同時說明「做什麼」與「何時使用」。
-7. 加入輸出與 QA。
-8. 若需要 Agent 自主性，加入 VAD 設計。
-9. 產出可版本化資料夾。
+5. 把詳細參考拆入 `docs/`、`templates/`、`examples/`。
+6. `description` 同時寫清楚「做什麼」與「何時觸發」。
+7. 定義 Output 與 QA。
+8. 定義失敗條件與 Human Review。
+9. 若需要自主決策，使用第 9 節升級 Agent。
+10. 版本化並建立 CHANGELOG。
 
-可直接使用 `templates/PROMPTLESS-SKILL-TEMPLATE.md`。
-
----
-
-## 8. 使用者體驗原則
-
-### 不要這樣做
-
-- 「請先用以下格式重新寫 Prompt：Role / Goal / Context / Output...」
-- 「請再把圖片內容全部打成文字。」
-- 「你必須先學會提示詞才能使用。」
-
-### 應該這樣做
-
-- 直接理解使用者現有素材。
-- 自動補齊可合理推定的結構。
-- 在必要時提出最少量問題。
-- 把複雜性留在 Skill／Agent 系統內，而不是丟回給終端使用者。
+模板：`templates/PROMPTLESS-SKILL-TEMPLATE.md`。
 
 ---
 
-## 9. 輸出模式
+## 9. 把 Skill 升級成 Promptless Agent
 
-依任務選擇最適合的輸出；不要固定只輸出文字。
+1. 先確認真的需要自主性。
+2. 將 TASK 升級為 GOAL。
+3. 定義 ROLE 與邊界。
+4. 列出可調度 SKILLS。
+5. 列出 TOOLS / MCP 與權限。
+6. 指定 KNOWLEDGE 與來源優先序。
+7. 把 PROCESS 轉成 WORKFLOW。
+8. 找出 DECISION 節點。
+9. 規定 SUB-AGENT / A2A 的使用條件。
+10. 建立 QA / EVALUATION / GOVERNANCE。
+11. 建立 VAD Agent Card。
+12. 建立平台原生 Agent 入口檔。
 
-可能包括：
-
-- 對話答案
-- Markdown
-- 圖卡
-- 簡報
-- PDF
-- 文件
-- 試算表
-- HTML
-- JSON / YAML
-- Skill 資料夾
-- Agent 設計
-- VAD 架構
+模板：`templates/PROMPTLESS-AGENT-TEMPLATE.md`。
 
 ---
 
-## 10. 觸發範例
+## 10. 跨模型規則
 
-應啟用本 Skill：
+本專案的核心規格不得為不同模型複製三份後各自改動。
 
-- 「不用 Prompt 幫我完成這個。」
-- 「照這張資訊卡做。」
-- 「我不要再學一堆提示詞。」
-- 「幫我把這個工作流程做成 Skill。」
-- 「我希望員工只要選功能就能執行。」
-- 「將這個 Skill 接到 Agent。」
-- 「用 VAD 把這套 Agent 畫清楚。」
-- 「讓這個方法可以給 ChatGPT、Gemini、Claude 使用。」
+**Single Source of Truth：**
 
-不一定需要啟用：
+- `SKILL.md`
+- `docs/`
+- `agents/promptless-vad-agent.md`
 
-- 單純詢問一個一次性的常識問題
-- 使用者明確要求學習／研究 Prompt Engineering 本身
+平台層只處理發現、啟用與工具差異：
+
+- ChatGPT / Codex → `CHATGPT.md`、`AGENTS.md`
+- Claude Code → `CLAUDE.md`、`.claude/agents/`
+- Gemini CLI → `GEMINI.md`、`.gemini/agents/`
+
+詳見 `docs/08-cross-model-agent.md`。
 
 ---
 
-## 11. 最終檢查
+## 11. 使用者體驗原則
+
+### 不要
+- 要求使用者先把需求重寫成 Role / Context / Output Prompt。
+- 已有圖片／文件卻要求全部再打一次文字。
+- 把所有複雜度推回給使用者。
+- 為了叫做 Agent 而加入不必要自主決策。
+
+### 要
+- 利用現有上下文。
+- 只詢問真正不可推定且會改變結果的必要資訊。
+- 能執行就執行，能產出檔案就產出檔案。
+- 把可重複專業方法封裝起來。
+- 讓 Agent 的決策與風險能用 VAD 被人理解。
+
+---
+
+## 12. 完成檢查
 
 交付前確認：
 
-- [ ] 終端使用者是否被迫寫不必要的長 Prompt？若是，重新設計。
-- [ ] Skill 是否可以重複使用？
-- [ ] 可變輸入是否與固定規則分離？
-- [ ] 是否有明確 QA？
-- [ ] 若是 Agent 任務，是否已使用 VAD 思維？
-- [ ] 是否優先使用平台原生能力？
-- [ ] 是否避免宣稱「系統完全沒有 Prompt」？
+- [ ] 使用者沒有被迫重寫已有需求。
+- [ ] TASK / GOAL 已明確。
+- [ ] INPUT / KNOWLEDGE 使用正確。
+- [ ] 已選擇最低足夠的 Skill / Workflow / Agent 層級。
+- [ ] 若為 Agent，VAD 十欄已定義。
+- [ ] Tool / MCP / Sub-Agent 權限符合任務。
+- [ ] QA / Evaluation 已通過。
+- [ ] 高風險節點已進行 Human Review。
+- [ ] 輸出是可直接使用成果。
+- [ ] 值得重用的改進已可版本化。

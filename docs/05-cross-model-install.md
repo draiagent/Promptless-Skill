@@ -1,111 +1,82 @@
-# ChatGPT、Claude、Gemini 跨模型安裝與召喚
+# 跨模型安裝與召喚
 
-> 本文件提供實務安裝方向。不同產品方案與介面可能更新，請以各平台當期官方文件為準。
+## 1. 原則
 
-## 1. 共通原則
-
-本 Repository 的主要可執行規格是：
-
-```text
-SKILL.md
-```
-
-`AGENTS.md`、`CLAUDE.md`、`GEMINI.md` 是平台／專案入口，不應複製另一套不同的核心規則。
+本 Repository 的核心規格是 `SKILL.md`，不是為每個模型重寫一份 Prompt。
 
 ---
 
 ## 2. ChatGPT
 
-支援 Skills 的 ChatGPT 工作區／產品，可將 Skill 從電腦上傳或透過 Skills 介面建立。安裝後，ChatGPT 可以在任務相關時自動使用 Skill，也可以由使用者明確選擇／召喚。
+若 ChatGPT 帳號／工作區提供 Skills：
 
-建議：
+1. 從 GitHub 下載 ZIP。
+2. 在 Skills 建立／上傳功能中匯入。
+3. 確認 Skill 可用後，以符合 description 的自然任務觸發，或直接說「使用 Promptless Skill」。
+4. 需要 Agent 時說：「把這個 Skill 升級成 Agent，使用 VAD。」
 
-1. 將 `Promptless-Skill` 資料夾壓縮為 ZIP。
-2. 在支援 Skills 的 ChatGPT 介面選擇建立／上傳 Skill。
-3. 上傳 ZIP。
-4. 確認 Skill 名稱 `promptless-skill` 與 description 已被辨識。
-5. 測試：「把這個工作流程封裝成不用提示詞的 Skill。」
-
-若目前帳號／工作區沒有 Skills 上傳功能，可把 Repository 作為專案／工作區參考資料使用；但這不等於原生 Skill 安裝。
+> 不同 ChatGPT 方案與介面支援狀態可能不同，以當下產品介面為準。
 
 ---
 
-## 3. Claude / Claude Code
+## 3. Claude Code
 
-### claude.ai
+### Skill
 
-可用自訂 Skills 的方案，可將 Skill 資料夾以 ZIP 上傳至自訂 Skills 功能。
+可將 Skill 放到 Claude Code 支援的個人或專案 Skills 路徑。
 
-### Claude Code
+### Agent
 
-個人 Skill：
-
-```text
-~/.claude/skills/promptless-skill/
-```
-
-專案 Skill：
+本 Repository 已提供：
 
 ```text
-.claude/skills/promptless-skill/
+.claude/agents/promptless-vad-agent.md
 ```
 
-其中必須存在：
-
-```text
-SKILL.md
-```
-
-Claude 會依 `name` 與 `description` 判斷何時需要使用。
+專案中啟動 Claude Code 後，可在 Agent 管理／委派流程中使用。
 
 ---
 
 ## 4. Gemini CLI
 
-Gemini CLI 支援 Agent Skills。
-
-可從 Git Repository 安裝：
+Gemini CLI 支援從 Git Repository 安裝 Agent Skill：
 
 ```bash
-gemini skills install https://github.com/<owner>/Promptless-Skill
+gemini skills install https://github.com/draiagent/Promptless-Skill
 ```
 
-也可放入：
+專案 Agent 定義：
 
 ```text
-~/.gemini/skills/
-~/.agents/skills/
-.gemini/skills/
-.agents/skills/
+.gemini/agents/promptless-vad-agent.md
 ```
 
-開發時可 link：
-
-```bash
-gemini skills link ./Promptless-Skill
-```
-
-重新載入：
-
-```text
-/skills reload
-```
-
-`GEMINI.md` 可作為專案持續性 Context，但 Promptless Skill 本身應使用 Agent Skill 機制按需啟用。
+可依 Gemini CLI 當前 Agent / Skills 指令重新載入。
 
 ---
 
-## 5. 建議測試句
+## 5. Codex
 
-安裝後測試：
+在 Repository 中使用：
 
-1. 「使用 Promptless Skill，把這份資料做成可重複工作流程。」
-2. 「照這張資訊卡直接完成，不要叫我先寫 Prompt。」
-3. 「把這個流程變成 Skill，並建立 TASK / INPUT / STYLE / PROCESS / OUTPUT / QA。」
-4. 「這個任務需要自主決策，請升級成 Agent 並用 VAD 表示。」
+```text
+AGENTS.md
+SKILL.md
+agents/promptless-vad-agent.md
+```
+
+Codex 可把 `AGENTS.md` 當專案行為與工作規格入口；重複流程則使用 Skill。
 
 ---
 
-## 6. 安全提醒
+## 6. 驗證安裝
 
-從 GitHub 安裝第三方 Skill 前，應閱讀 `SKILL.md` 與任何 scripts。Skill 可能具有檔案、程式碼或工具存取能力；不要只因 Repository 公開就直接信任執行。
+安裝後測試以下任務：
+
+> 「我有一份資料與參考圖，請直接依 Promptless Skill 完成，不要叫我改寫 Prompt。」
+
+再測：
+
+> 「這個工作需要中途決策，請升級成 Promptless Agent，並輸出 VAD 十欄。」
+
+應能看出 Skill 與 Agent 的層級差異。

@@ -1,13 +1,18 @@
-# GEMINI.md
+# GEMINI.md｜Gemini CLI 專案入口
 
-本專案的核心技能是 **Promptless Skill｜無提示詞技能方法論**。
-
-請優先參考：
+本專案核心：**Promptless Skill × VAD**。
 
 @./SKILL.md
-@./docs/01-methodology.md
-@./docs/02-skill-vad.md
-@./docs/03-agent-vad.md
-@./docs/04-visual-skill-card.md
+@./docs/07-promptless-agent-methodology.md
+@./agents/promptless-vad-agent.md
+@./docs/11-governance.md
 
-本檔只提供 Gemini 專案層入口；核心 Skill 的唯一真相來源仍為 `SKILL.md`，避免規則重複與漂移。
+Gemini CLI 專案 Agent 定義：
+
+- `.gemini/agents/promptless-vad-agent.md`
+
+本檔只做專案層 Context 入口；不要在此複製第二套方法論。
+
+> Promptless = Zero Prompting for End Users
+
+> Skill 是能力，Agent 是大腦，VAD 是藍圖。
