@@ -68,6 +68,30 @@ python tools/vac_runner.py envelope VAC-VIDEO-001
 
 Use the runner as a deterministic helper for card discovery, basic/schema validation, normalized planning and cross-model execution envelopes. The runner does not replace model reasoning or Human Review.
 
+## Self-Describing VAC
+
+When a visual card is paired with a machine-readable VAC, prefer a Self-Describing VAC binding so the image can carry a validated machine layer.
+
+```text
+Visual Layer
++ Machine Layer
++ SHA-256 Integrity
++ PNG metadata / sidecar JSON
++ Sync Policy
+```
+
+If the environment can execute Python:
+
+```bash
+python tools/vac_self_describing.py convert VAC-VIDEO-001 --out /tmp/video.skill.json
+python tools/vac_self_describing.py wrap VAC-VIDEO-001 --out /tmp/video.self.json
+python tools/vac_self_describing.py embed VAC-VIDEO-001 card.png --out card.self.png --sidecar card.self.json
+```
+
+If an embedded Machine Layer and the visible card disagree on a material task requirement, do not silently choose one. Treat the validated machine layer as the precise execution source and require Human Review to repair the visual/machine mismatch before high-impact execution.
+
+Reference: `../../../docs/SELF-DESCRIBING-VAC.md`.
+
 ## Visual-first rule
 
 If the user supplies a visual card, flowchart, sketch, screenshot, or reference image, inspect it first. Do not require the user to rewrite information already visible in the image. Ask only for missing Critical inputs.
@@ -81,6 +105,7 @@ Keep human review for irreversible external actions, high-stakes decisions, sens
 - `AGENT.md`
 - `CARD-REGISTRY.md`
 - `docs/METHODOLOGY.md`
+- `docs/SELF-DESCRIBING-VAC.md`
 - `templates/TRC-3D.md`
 - `templates/VAC-8.md`
 - `rubrics/VAC-QI.md`
