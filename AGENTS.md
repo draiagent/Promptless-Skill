@@ -20,3 +20,7 @@
 - 涉及外部寫入、付款、刪除、發布、醫療、法律、財務或其他高影響行為時，遵守平台安全要求與 Human Review。
 
 > **Skill 是能力，Agent 是大腦，VAD 是藍圖。**
+
+## v0.3.0 Machine-readable 規則
+
+遇到 Visual Skill Card、VAD Agent Card 或 JSON 卡片時，讀取 `docs/13-machine-readable-schema.md` 與 `docs/15-agent-upgrade-decision.md`，並依 `schemas/` 驗證。固定流程不要為了形式升級 Agent。

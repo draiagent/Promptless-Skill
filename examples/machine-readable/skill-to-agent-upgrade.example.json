@@ -1,0 +1,12 @@
+{
+  "schema_version":"0.3.0","card_type":"skill","id":"competitive-monitoring-skill-v1","name":"競爭情報持續監測","description":"範例：因需要動態選工具、重新規劃與持續狀態，應由分類器建議升級 Agent。","language":"zh-TW",
+  "metadata":{"version":"1.0.0","author":"Promptless Skill contributors","license":"MIT","tags":["infographic","enterprise","zh-TW"]},
+  "task":{"objective":"持續監測競爭情報並依新資料調整研究路徑","task_type":"content-design","success_definition":"內容重點完整、無明顯錯字、版面規格與品牌限制均符合要求"},
+  "input":[{"name":"content","type":"text","required":true,"description":"原始文字或可轉成文字的資料"},{"name":"brand_logo","type":"image","required":false,"description":"品牌 Logo"}],
+  "style":{"language":"zh-TW","tone":"專業、清楚、易讀","brand":"依輸入品牌資產","format_constraints":["預設 3:4 直式","資訊層級清楚"],"content_constraints":["不得捏造數據","繁體中文"]},
+  "process":[{"id":"p1","name":"理解","action":"萃取目標、受眾與重點","on_failure":"human_review"},{"id":"p2","name":"結構化","action":"建立標題、分區與資訊層級","on_failure":"retry"},{"id":"p3","name":"品質檢查","action":"檢查錯字、遺漏、品牌與格式","on_failure":"retry"}],
+  "output":{"artifacts":[{"name":"infographic_spec","type":"document","format":"markdown","required":true}],"delivery":"回傳可直接用於圖卡生成的結構化規格"},
+  "qa":{"checks":[{"id":"q1","criterion":"重點與原始資料一致","severity":"blocker","method":"model"},{"id":"q2","criterion":"繁體中文與錯字檢查","severity":"blocker","method":"model"},{"id":"q3","criterion":"品牌與版面限制符合","severity":"warning","method":"human"}],"pass_policy":"all_blockers"},
+  "execution":{"autonomy_level":4,"dynamic_branching":true,"dynamic_tool_selection":true,"replanning":true,"persistent_state":true,"delegation":false,"multi_agent":false,"external_side_effects":false,"human_approval_required":false,"allowed_tools":[]},
+  "upgrade_policy":{"allow_agent_upgrade":true,"mode":"automatic","forced_reasons":[]}
+}

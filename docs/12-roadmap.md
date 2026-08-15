@@ -6,10 +6,11 @@
 - 新增更多企業範例
 - 建立一致的 Evaluation Rubric
 
-## v0.3.x｜Visual Schema
-- Visual Skill Card Schema
-- VAD Agent Card Schema
-- Machine-readable YAML / JSON 對照
+## v0.3.0｜Machine-readable Schema（已完成）
+- Visual Skill Card JSON Schema
+- VAD Agent Card JSON Schema
+- Card 驗證、分類與 Compiler 參考實作
+- Skill → Agent 自動升級判斷
 
 ## v0.4.x｜跨平台測試
 - ChatGPT Skill 測試

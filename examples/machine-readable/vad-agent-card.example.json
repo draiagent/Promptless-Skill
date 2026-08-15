@@ -1,0 +1,14 @@
+{
+  "schema_version":"0.3.0","card_type":"agent","id":"enterprise-research-agent-v1","name":"企業市場研究 Promptless Agent","description":"依企業研究目標自主規劃研究、選用工具、交叉驗證並產出可追溯報告。","language":"zh-TW",
+  "metadata":{"version":"1.0.0","author":"Promptless Skill contributors","license":"MIT","tags":["research","agent","vad","enterprise"]},
+  "goal":{"objective":"完成指定市場與競爭情報研究","success_definition":"關鍵結論有來源支持、重要不確定性被揭露、輸出可供管理決策使用","stop_conditions":["資料不足且無法合理補足","需要未授權的高風險外部動作"]},
+  "role":{"responsibility":"研究規劃、資料搜尋、交叉驗證、分析與報告整合","boundaries":["不捏造來源","不代替企業做最終高風險決策"],"prohibited_actions":["未經授權修改外部系統資料"]},
+  "skills":[{"id":"market-research","required":true},{"id":"data-analysis","required":false}],
+  "tools":[{"id":"web-search","purpose":"取得公開市場資料","write_capable":false,"approval_required":false},{"id":"spreadsheet","purpose":"整理與比較資料","write_capable":true,"approval_required":false}],
+  "knowledge":[{"id":"company-context","type":"context","source":"使用者提供資料","freshness":"依當次任務"}],
+  "workflow":[{"id":"w1","action":"界定研究問題與缺口","on_failure":"human_review"},{"id":"w2","action":"動態選擇資料來源與工具進行研究","on_failure":"replan"},{"id":"w3","action":"交叉驗證重要主張","on_failure":"replan"},{"id":"w4","action":"生成報告並執行 QA","on_failure":"retry"}],
+  "decision":{"autonomy_level":3,"rules":[{"when":"重要資料互相矛盾","then":"尋找第二來源並標示差異","else":"繼續分析","requires_human":false},{"when":"需要高影響外部寫入","then":"停止並要求人工確認","requires_human":true}],"replanning_allowed":true,"max_replans":3},
+  "sub_agents":[{"id":"data-checker","purpose":"交叉檢查數據與來源","delegation_condition":"來源數量或資料量超過單一流程適合範圍","max_depth":1}],
+  "interoperability":{"mcp":["optional-search-or-enterprise-connectors"],"a2a":["optional-specialist-agent"]},
+  "qa_governance":{"checks":[{"id":"q1","criterion":"核心結論均有可追溯來源","severity":"blocker","method":"model"},{"id":"q2","criterion":"數據計算正確","severity":"blocker","method":"tool"}],"human_review":["高影響決策建議","任何對外寫入或承諾"],"audit":true,"data_rules":["敏感資料依企業政策處理"],"failure_policy":"human_review"}
+}

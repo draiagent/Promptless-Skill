@@ -1,0 +1,29 @@
+name: Schema Validation
+
+on:
+  push:
+    paths:
+      - "schemas/**"
+      - "examples/machine-readable/**"
+      - "tools/**"
+      - "tests/**"
+  pull_request:
+    paths:
+      - "schemas/**"
+      - "examples/machine-readable/**"
+      - "tools/**"
+      - "tests/**"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r tools/requirements.txt pytest
+      - run: pytest -q
+      - run: python tools/promptless_card.py validate examples/machine-readable/visual-skill-card.example.json
+      - run: python tools/promptless_card.py validate examples/machine-readable/vad-agent-card.example.json
+      - run: python tools/promptless_card.py classify examples/machine-readable/skill-to-agent-upgrade.example.json
