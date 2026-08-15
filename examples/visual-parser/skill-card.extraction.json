@@ -1,0 +1,10 @@
+{
+  "schema_version": "0.3.1",
+  "source": {"type": "image", "filename": "infographic-card.png", "mime_type": "image/png", "language_hint": "zh-TW"},
+  "intent": {"candidate_type": "skill", "name": "企業資訊圖卡 Skill", "objective": "把企業 AI 課程內容整理成繁體中文資訊圖卡", "success_definition": "資訊正確、排版層級清楚、無繁體中文錯字"},
+  "fields": {"input": ["課程文字資料", "公司 Logo 圖片"], "style": ["繁體中文", "排版整齊", "品牌一致"], "process": ["萃取重點", "建立資訊層級", "規劃圖卡內容", "檢查錯字與完整性"], "output": ["3:4 資訊圖卡"], "qa": ["不得扭曲原始內容", "繁體中文無明顯錯字", "視覺層級清楚"]},
+  "signals": {"dynamic_branching": false, "dynamic_tool_selection": false, "replanning": false, "persistent_state": false, "delegation": false, "multi_agent": false, "external_side_effects": false, "human_approval_required": false},
+  "confidence": 0.95,
+  "uncertainties": [],
+  "raw_text": ["TASK", "INPUT", "STYLE", "PROCESS", "OUTPUT", "QA"]
+}

@@ -5,12 +5,16 @@ on:
     paths:
       - "schemas/**"
       - "examples/machine-readable/**"
+      - "examples/visual-parser/**"
+      - "adapters/**"
       - "tools/**"
       - "tests/**"
   pull_request:
     paths:
       - "schemas/**"
       - "examples/machine-readable/**"
+      - "examples/visual-parser/**"
+      - "adapters/**"
       - "tools/**"
       - "tests/**"
 
@@ -27,3 +31,5 @@ jobs:
       - run: python tools/promptless_card.py validate examples/machine-readable/visual-skill-card.example.json
       - run: python tools/promptless_card.py validate examples/machine-readable/vad-agent-card.example.json
       - run: python tools/promptless_card.py classify examples/machine-readable/skill-to-agent-upgrade.example.json
+      - run: python tools/visual_card_parser.py validate-extraction examples/visual-parser/skill-card.extraction.json
+      - run: python tools/visual_card_parser.py validate-extraction examples/visual-parser/agent-card.extraction.json

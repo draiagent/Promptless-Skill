@@ -1,0 +1,10 @@
+{
+  "schema_version": "0.3.1",
+  "source": {"type": "image", "filename": "market-agent-card.png", "mime_type": "image/png", "language_hint": "zh-TW"},
+  "intent": {"candidate_type": "agent", "name": "企業市場研究 Agent", "objective": "持續蒐集市場資料並依新資訊調整分析計畫", "success_definition": "來源可追溯、分析完整、重要決策經人工核准"},
+  "fields": {"process": ["判斷研究問題", "動態選擇搜尋或資料分析工具", "根據中間結果重規劃", "生成報告"], "qa": ["重要數據需有來源", "重大策略建議需人工審核"], "role": "企業市場研究代理", "skills": ["market-research", "data-analysis", "report-writing"], "tools": ["web-search", "spreadsheet"], "knowledge": ["企業知識庫"], "decisions": ["依結果決定下一輪研究"], "sub_agents": ["財務 Agent"], "interoperability": ["MCP: CRM", "A2A: 財務 Agent"], "governance": ["外部寫入前需人工核准"]},
+  "signals": {"dynamic_branching": true, "dynamic_tool_selection": true, "replanning": true, "persistent_state": true, "delegation": true, "multi_agent": true, "external_side_effects": false, "human_approval_required": true},
+  "confidence": 0.91,
+  "uncertainties": [{"field": "tools", "reason": "卡片只標示工具類別，未指定實際 Provider", "confidence": 0.7}],
+  "raw_text": ["市場研究 Agent", "MCP", "A2A"]
+}
