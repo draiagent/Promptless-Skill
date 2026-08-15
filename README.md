@@ -6,6 +6,27 @@
 **語言：繁體中文（zh-TW）**  
 **定位：公開教學／企業 AI 導入／Skill-first／Agent／VAD／Self-Describing Visual Card**
 
+## 🚀 Start Here｜第一次使用 VAD
+
+如果你第一次來，直接從這裡開始：
+
+- [`visual-agent-design/QUICKSTART.md`](visual-agent-design/QUICKSTART.md) — 10 分鐘開始使用 VAD
+- [`visual-agent-design/CARD-REGISTRY.md`](visual-agent-design/CARD-REGISTRY.md) — 5 張標準 Visual Agent Cards
+- [`visual-agent-design/examples/README.md`](visual-agent-design/examples/README.md) — Five-Pack 教學與實例
+- [`visual-agent-design/docs/SELF-DESCRIBING-VAC.md`](visual-agent-design/docs/SELF-DESCRIBING-VAC.md) — 讓圖卡攜帶可驗證的機器規格
+
+目前標準 Five-Pack：
+
+| Card ID | 任務 |
+|---|---|
+| `VAC-VIDEO-001` | 影片剪輯 |
+| `VAC-SLIDE-001` | 簡報製作 |
+| `VAC-WEB-001` | 網站生成 |
+| `VAC-DATA-001` | 數據分析 |
+| `VAC-REPORT-001` | 報告製作 |
+
+每張卡都有 Human-readable Markdown 與 Machine-readable JSON，可供 ChatGPT / Codex、Gemini、Claude 與其他 Agent / Workflow 系統重用。
+
 ## 🆕 Visual Agent Design 完整 Agent 套件
 
 本 Repository 現在同時提供兩個層次：
@@ -16,11 +37,13 @@
 完整 VAD Agent 套件位於：
 
 - [`visual-agent-design/README.md`](visual-agent-design/README.md)
+- [`visual-agent-design/QUICKSTART.md`](visual-agent-design/QUICKSTART.md)
 - [`visual-agent-design/AGENT.md`](visual-agent-design/AGENT.md)
 - [`visual-agent-design/AGENTS.md`](visual-agent-design/AGENTS.md)
 - [`visual-agent-design/CLAUDE.md`](visual-agent-design/CLAUDE.md)
 - [`visual-agent-design/GEMINI.md`](visual-agent-design/GEMINI.md)
 - [`visual-agent-design/CHATGPT.md`](visual-agent-design/CHATGPT.md)
+- [`visual-agent-design/CARD-REGISTRY.md`](visual-agent-design/CARD-REGISTRY.md)
 
 > **Promptless 是介面策略；VAD 是任務與 Agent 設計方法論。**
 
@@ -45,6 +68,8 @@ Visual Card
 └─ Sync Layer       → 人機內容不一致時的處理規則
 ```
 
+VAD 現在也提供 `visual-agent-design/tools/vac_self_describing.py`，可把 Five-Pack 的 VAC-8 JSON 轉成 Promptless Visual Skill Card、Self-Describing Envelope，並嵌入 PNG metadata。
+
 ## 標準相容結構
 
 ```text
@@ -56,17 +81,22 @@ VAD-Promptless/
 ├── CHATGPT.md
 ├── LICENSE
 ├── visual-agent-design/         # 完整 VAD Agent / 方法論
+│   ├── README.md
+│   ├── QUICKSTART.md
 │   ├── AGENT.md
 │   ├── AGENTS.md
 │   ├── CLAUDE.md
 │   ├── GEMINI.md
 │   ├── CHATGPT.md
+│   ├── CARD-REGISTRY.md
 │   ├── .agents/skills/
 │   ├── docs/
 │   ├── templates/
 │   ├── rubrics/
 │   ├── research/
 │   ├── schemas/
+│   ├── tools/
+│   ├── tests/
 │   └── examples/
 ├── skills/
 │   └── vad-promptless/
@@ -98,7 +128,21 @@ YAML：`name: vad-promptless`；父資料夾：`skills/vad-promptless/`；技能
 → SHA-256 Verify → Compile / Execute
 ```
 
+VAD Five-Pack 的完整路徑進一步是：
+
+```text
+Task
+→ TRC-3D
+→ CARD-REGISTRY
+→ VAC-8
+→ Agent / Workflow
+→ Acceptance Criteria
+→ Self-Describing Visual Card
+```
+
 ## 主要規格與工具
+
+### VAD-Promptless
 
 - `skills/vad-promptless/SKILL.md`
 - `skills/vad-promptless/schemas/self-describing-visual-card.schema.json`
@@ -106,6 +150,15 @@ YAML：`name: vad-promptless`；父資料夾：`skills/vad-promptless/`；技能
 - `skills/vad-promptless/tools/png_card_metadata.py`
 - `skills/vad-promptless/tools/visual_card_parser.py`
 - `skills/vad-promptless/tools/promptless_card.py`
+
+### Visual Agent Design
+
+- `visual-agent-design/AGENT.md`
+- `visual-agent-design/CARD-REGISTRY.md`
+- `visual-agent-design/schemas/vac-8.schema.json`
+- `visual-agent-design/tools/vac_runner.py`
+- `visual-agent-design/tools/vac_self_describing.py`
+- `visual-agent-design/examples/cards-manifest.json`
 
 ## Clone 與安裝
 
@@ -120,7 +173,11 @@ cd VAD-Promptless
 cd visual-agent-design
 ```
 
-此目錄包含 OpenAI Codex、Claude Code、Gemini CLI 與一般 ChatGPT 使用入口。詳細說明見 `visual-agent-design/README.md`。
+第一次使用建議先看：
+
+```text
+QUICKSTART.md
+```
 
 ### Claude Code｜VAD-Promptless Skill
 
@@ -139,13 +196,43 @@ gemini skills install https://github.com/draiagent/VAD-Promptless.git --path ski
 
 將 `skills/vad-promptless/` 下載或封裝為 Skill 套件；Codex 專案層可讀取根目錄 `AGENTS.md`。
 
+## Five-Pack 快速測試
+
+```bash
+cd visual-agent-design
+python tools/vac_runner.py list
+python tools/vac_runner.py route "分析 Excel 並產出圖表"
+python tools/vac_runner.py validate VAC-DATA-001
+python tools/vac_runner.py plan VAC-DATA-001
+```
+
+Self-Describing VAC：
+
+```bash
+pip install jsonschema pillow
+python tools/vac_self_describing.py wrap VAC-DATA-001 --out /tmp/data.self.json
+```
+
 ## Self-Describing Card
+
+VAD-Promptless 原始工具：
 
 ```bash
 cd skills/vad-promptless
 python tools/self_describing_card.py wrap examples/machine-readable/visual-skill-card.example.json --out /tmp/card.self.json
 python tools/self_describing_card.py validate /tmp/card.self.json
 python tools/png_card_metadata.py embed card.png /tmp/card.self.json --out card.self.png
+```
+
+Visual Agent Design Five-Pack 可直接使用 VAD Bridge：
+
+```bash
+cd visual-agent-design
+python tools/vac_self_describing.py embed \
+  VAC-VIDEO-001 \
+  VAC_VIDEO_001.png \
+  --out VAC_VIDEO_001.self.png \
+  --sidecar VAC_VIDEO_001.self.json
 ```
 
 ## Skill 與 Agent 分界
@@ -158,6 +245,21 @@ python tools/png_card_metadata.py embed card.png /tmp/card.self.json --out card.
 
 `GOAL | ROLE | SKILLS | TOOLS | KNOWLEDGE | WORKFLOW | DECISION | SUB-AGENTS | MCP/A2A | QA/GOVERNANCE`
 
+## 公開教學與研究
+
+VAD Five-Pack 可用於 A/B/C/D/E/F 跨任務實驗：
+
+```text
+A 純文字提示
+B 素材 + VAC
+C 素材 + VAC + 少量文字
+D 等資訊量文字 SOP
+E 裝飾型圖卡
+F TRC-3D + VAC + Agent
+```
+
+研究程序：`visual-agent-design/research/RESEARCH-PROTOCOL.md`。
+
 ## 授權
 
-MIT License。
+MIT License。可用於公開教學、研究、企業導入與二次開發；引用 VAD 研究概念時建議標示 Visual Agent Design（VAD）與原 Repository。
