@@ -4,10 +4,12 @@ on:
   push:
     paths:
       - 'visual-agent-design/**'
+      - 'skills/vad-promptless/**'
       - '.github/workflows/vad-five-pack.yml'
   pull_request:
     paths:
       - 'visual-agent-design/**'
+      - 'skills/vad-promptless/**'
       - '.github/workflows/vad-five-pack.yml'
 
 jobs:
@@ -22,8 +24,8 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install schema validator
-        run: python -m pip install --disable-pip-version-check jsonschema
+      - name: Install validators and image metadata dependency
+        run: python -m pip install --disable-pip-version-check jsonschema pillow
 
       - name: Run regression tests
         working-directory: visual-agent-design
@@ -46,3 +48,13 @@ jobs:
           python tools/vac_runner.py route '建立RWD網站'
           python tools/vac_runner.py route '分析Excel數據'
           python tools/vac_runner.py route '整理正式報告'
+
+      - name: Convert and wrap all Five-Pack VACs
+        working-directory: visual-agent-design
+        run: |
+          mkdir -p /tmp/vad-self
+          python tools/vac_self_describing.py wrap VAC-VIDEO-001 --out /tmp/vad-self/video.self.json
+          python tools/vac_self_describing.py wrap VAC-SLIDE-001 --out /tmp/vad-self/slide.self.json
+          python tools/vac_self_describing.py wrap VAC-WEB-001 --out /tmp/vad-self/web.self.json
+          python tools/vac_self_describing.py wrap VAC-DATA-001 --out /tmp/vad-self/data.self.json
+          python tools/vac_self_describing.py wrap VAC-REPORT-001 --out /tmp/vad-self/report.self.json
