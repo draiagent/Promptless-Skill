@@ -34,7 +34,9 @@ class SelfDescribingBridgeTest(unittest.TestCase):
                 _, vac = bridge.resolve_vac(card_id)
                 payload = bridge.vac_to_skill(vac)
                 self.assertEqual(payload["card_type"], "skill")
-                self.assertEqual(payload["id"], card_id)
+                self.assertEqual(payload["id"], card_id.lower())
+                self.assertEqual(payload["task"]["task_type"], card_id)
+                self.assertIn(card_id, payload["metadata"]["tags"])
                 self.assertTrue(payload["process"])
                 self.assertTrue(payload["qa"]["checks"])
                 bridge.promptless_card.validate(payload)
@@ -45,7 +47,7 @@ class SelfDescribingBridgeTest(unittest.TestCase):
                 _, vac = bridge.resolve_vac(card_id)
                 payload = bridge.vac_to_skill(vac)
                 envelope = bridge.sdc.wrap(payload, mode="hybrid")
-                self.assertEqual(envelope["id"], card_id)
+                self.assertEqual(envelope["id"], card_id.lower())
                 self.assertEqual(envelope["binding"]["metadata_key"], "vad-promptless")
                 self.assertIn("png-metadata", envelope["binding"]["carriers"])
                 bridge.sdc.validate_envelope(envelope)
@@ -68,7 +70,7 @@ class SelfDescribingBridgeTest(unittest.TestCase):
             bridge.embed_png(source, envelope, output)
 
             extracted = bridge.extract_png(output)
-            self.assertEqual(extracted["id"], "VAC-VIDEO-001")
+            self.assertEqual(extracted["id"], "vac-video-001")
             self.assertEqual(
                 extracted["integrity"]["payload_sha256"],
                 envelope["integrity"]["payload_sha256"],
@@ -79,6 +81,7 @@ class SelfDescribingBridgeTest(unittest.TestCase):
         payload = bridge.vac_to_skill(vac)
         rendered = json.dumps(payload, ensure_ascii=False)
         self.assertIn("VAC-DATA-001", rendered)
+        self.assertIn("vac-data-001", rendered)
 
 
 if __name__ == "__main__":
