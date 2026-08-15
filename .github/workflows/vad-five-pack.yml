@@ -1,0 +1,48 @@
+name: VAD Five-Pack CI
+
+on:
+  push:
+    paths:
+      - 'visual-agent-design/**'
+      - '.github/workflows/vad-five-pack.yml'
+  pull_request:
+    paths:
+      - 'visual-agent-design/**'
+      - '.github/workflows/vad-five-pack.yml'
+
+jobs:
+  validate-vac:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install schema validator
+        run: python -m pip install --disable-pip-version-check jsonschema
+
+      - name: Run regression tests
+        working-directory: visual-agent-design
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+
+      - name: Validate registered cards
+        working-directory: visual-agent-design
+        run: |
+          python tools/vac_runner.py validate VAC-VIDEO-001
+          python tools/vac_runner.py validate VAC-SLIDE-001
+          python tools/vac_runner.py validate VAC-WEB-001
+          python tools/vac_runner.py validate VAC-DATA-001
+          python tools/vac_runner.py validate VAC-REPORT-001
+
+      - name: Smoke-test routing
+        working-directory: visual-agent-design
+        run: |
+          python tools/vac_runner.py route '剪輯影片並加字幕'
+          python tools/vac_runner.py route '製作PPTX簡報'
+          python tools/vac_runner.py route '建立RWD網站'
+          python tools/vac_runner.py route '分析Excel數據'
+          python tools/vac_runner.py route '整理正式報告'
