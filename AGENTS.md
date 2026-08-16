@@ -1,34 +1,73 @@
 # AGENTS.md｜Codex / 通用 Agent 專案入口
 
-本 Repository 包含兩個相關但不同層次：
+## Repository Mission
 
-1. **VAD-Promptless**：Zero Prompting for End Users 的 Skill / Agent 實作。
-2. **Visual Agent Design（VAD）**：任務診斷、三維路由、VAC-8、Agent Blueprint、執行與驗收的完整方法論。
+本 Repository 只負責 **VAD-Promptless**：Zero Prompting for End Users、Visual Card Parsing、Promptless Skill / Workflow / Agent、Self-Describing Visual Card 與跨模型 Promptless 執行。
 
-## VAD-Promptless
+完整 Visual Agent Design（VAD）Core 已獨立維護於：
 
-必讀：
+https://github.com/draiagent/Visual-Agent-Design
+
+> **Visual-Agent-Design 是 VAD Core 的唯一 Source of Truth。**
+
+## Required Local Sources
+
+執行本 Repo 任務時優先讀取：
 
 1. `skills/vad-promptless/SKILL.md`
 2. `skills/vad-promptless/docs/07-promptless-agent-methodology.md`
-3. `skills/vad-promptless/docs/03-agent-vad.md`
-4. `skills/vad-promptless/agents/vad-promptless-agent.md`
-5. `skills/vad-promptless/docs/11-governance.md`
+3. `skills/vad-promptless/agents/vad-promptless-agent.md`
+4. `skills/vad-promptless/docs/11-governance.md`
 
-原則：Promptless = Zero Prompting for End Users；固定流程用 Skill / Workflow，需要動態決策才升級 Agent；高影響行為遵守平台安全與 Human Review。
+## Core Rules
 
-## Visual Agent Design（VAD）
+- Promptless = Zero Prompting for End Users。
+- 不要求使用者重寫圖片、附件或上下文中已經存在的需求。
+- 固定流程優先使用 Skill / Workflow。
+- 只有需要動態決策、重新規劃、動態選工具、持續狀態或委派時才升級 Agent。
+- 圖卡進入執行前，優先正規化為可驗證 Machine Layer。
+- Self-Describing Card 應驗證 schema、payload 與 SHA-256。
+- Human Layer 與 Machine Layer 重大衝突時，需要 Human Review。
+- 高影響、敏感資料、不可逆外部行為遵守平台安全與確認機制。
 
-當任務要求 VAD、Visual Agent Card、TRC-3D、圖卡驅動 Agent、跨模型 Agent、VAD 研究或企業導入時，優先讀取：
+## VAD Core Boundary
 
-1. `visual-agent-design/AGENTS.md`
-2. `visual-agent-design/AGENT.md`
-3. `visual-agent-design/docs/METHODOLOGY.md`
+當任務涉及以下內容：
 
-VAD 核心流程：
+- TRC-3D
+- VAC-8
+- Standard VAC Five-Pack
+- VAD Agent Blueprint
+- VAD Core Routing
+- VAD Core Research Protocol
+- VAD Core Governance Standard
+
+不要在本 Repository 重新建立第二套標準。
+
+應使用上游：
+
+https://github.com/draiagent/Visual-Agent-Design
+
+若上游資料沒有被載入目前工作環境，明確指出 dependency，而不是引用已移除的本地 `visual-agent-design/` 路徑。
+
+## Promptless Bridge
 
 ```text
-任務診斷 → TRC-3D 路由 → VAC-8 視覺規格 → Agent 執行 → 驗收 → 知識回存
+VAD / Skill / Task Spec
+→ Promptless Bridge
+→ Visual / Machine Representation
+→ Integrity Validation
+→ Skill / Workflow / Agent
+→ QA / Human Review
 ```
 
-> **Skill 是能力，Workflow 是流程，Agent 是大腦，VAD 是藍圖，VAC 是任務卡。**
+## Completion Check
+
+完成前確認：
+
+- 使用者沒有被迫重寫已有需求。
+- 選擇最低足夠的 Skill / Workflow / Agent 層級。
+- Machine Layer 可驗證。
+- 失敗條件與 Human Review 已處理。
+- 沒有把 VAD Core 規格偷偷 fork 成本地第二版本。
+- 輸出可直接使用或明確說明缺少的必要依賴。

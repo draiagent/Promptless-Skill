@@ -1,8 +1,8 @@
 # GEMINI.md｜Gemini CLI 專案入口
 
-本 Repository 同時提供 **VAD-Promptless** 與完整 **Visual Agent Design（VAD）**。
+本 Repository 僅維護 **VAD-Promptless**。
 
-## VAD-Promptless
+## Local Promptless Sources
 
 @./skills/vad-promptless/SKILL.md
 @./skills/vad-promptless/docs/07-promptless-agent-methodology.md
@@ -11,15 +11,30 @@
 
 Gemini Agent：`.gemini/agents/vad-promptless-agent.md`。
 
-## Visual Agent Design
+## Behavior
 
-當使用者要求 VAD、TRC-3D、VAC-8、圖卡驅動 Agent、任務路由、Agent Blueprint 或 VAD 研究時，使用：
+- 先利用現有圖片、附件、上下文與規則。
+- 固定任務維持 Skill / Workflow。
+- 需要依觀察結果動態改變執行路徑時才升級 Agent。
+- 圖卡先結構化與驗證，再進入執行。
+- Human / Machine Layer 衝突時不得靜默猜測。
 
-@./visual-agent-design/AGENT.md
-@./visual-agent-design/docs/METHODOLOGY.md
-@./visual-agent-design/templates/TRC-3D.md
-@./visual-agent-design/templates/VAC-8.md
+## Visual Agent Design Core
 
-可按需啟用 `.agents/skills/visual-agent-design/SKILL.md`；Gemini Agent 定義：`.gemini/agents/visual-agent-design-agent.md`。
+完整 VAD 上游：
 
-核心原則：先診斷，再路由；先結構，再執行；最後驗收。
+https://github.com/draiagent/Visual-Agent-Design
+
+TRC-3D、VAC-8、Standard VAC、Agent Blueprint、VAD Research 與 Core Governance 以上游為準。
+
+本 Repo 不再提供第二份 `visual-agent-design/`。
+
+整合順序：
+
+```text
+VAD Core
+→ VAC / Spec
+→ Promptless Bridge
+→ Self-Describing Card
+→ Gemini Skill / Workflow / Agent
+```

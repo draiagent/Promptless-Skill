@@ -1,8 +1,8 @@
 cff-version: 1.2.0
 title: "VAD-Promptless"
-message: "如果本方法論對你的研究、教學或專案有幫助，請引用此 Repository。"
+message: "如果本 Promptless UX / Self-Describing Visual Card 實作對你的研究、教學或專案有幫助，請引用此 Repository；Visual Agent Design Core 請另引用其官方 Repository。"
 type: software
-version: 0.4.0
+version: 0.5.0
 date-released: 2026-08-16
 authors:
   - family-names: "Chen"
